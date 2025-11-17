@@ -1,0 +1,39 @@
+[package]
+name = "rs_order_utils"
+version = "0.1.0"
+edition = "2021"
+authors = ["Polymarket"]
+license = "MIT"
+description = "Rust implementation of Polymarket CLOB order utilities with EIP-712 signing"
+
+[dependencies]
+# Alloy core types and primitives
+alloy-primitives = "0.8"
+alloy-sol-types = "0.8"
+alloy-signer = "0.5"
+alloy-signer-local = "0.5"
+
+# Crypto
+k256 = { version = "0.13", features = ["ecdsa", "std"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
+
+# Error handling
+thiserror = "1.0"
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"], optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full", "test-util"] }
+
+[[example]]
+name = "basic_order"
+required-features = []
+
+[features]
+default = []
+async = ["tokio"]

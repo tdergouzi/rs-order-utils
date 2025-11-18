@@ -59,23 +59,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Core Components
-
-### ExchangeOrderBuilder
-
-The main entry point for creating and signing orders. Key methods:
-- `build_signed_order()` - Build and sign an order in one step (recommended)
-- `build_order()` - Build an order without signing
-- `sign_order()` - Sign an existing order
-
-### Types
-
-- **OrderData**: Input parameters for creating an order (maker, taker, amounts, side, etc.)
-- **Order**: EIP-712 compliant order structure
-- **SignedOrder**: Order with cryptographic signature
-- **Side**: `Buy` or `Sell`
-- **SignatureType**: `Eoa`, `PolyProxy`, or `PolyGnosisSafe`
-
 ## Usage
 
 ```bash

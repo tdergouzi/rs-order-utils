@@ -79,10 +79,13 @@ cargo test -- --nocapture
 - ✅ **Signer Verification**: The builder verifies that the signer matches the wallet address
 - 🛡️ **Domain Separation**: Orders are bound to specific chain and contract addresses
 
-## Dependencies
+## Notice
 
-- **alloy-rs**: Modern Ethereum library for types, EIP-712, and signing
-- **tokio**: Async runtime
+⚠️ **AI-Generated Code**: This library was generated with AI assistance. While it has been tested, users should:
+- Review the code thoroughly before using in production
+- Conduct their own security audits
+- Test extensively with their specific use cases
+- Use at their own risk
 
 ## License
 

@@ -1,10 +1,15 @@
 [package]
 name = "rs_order_utils"
 version = "0.1.0"
-edition = "2021"
-authors = ["Polymarket"]
+edition = "2025"
+authors = ["Ted"]
 license = "MIT"
 description = "Rust implementation of Polymarket CLOB order utilities with EIP-712 signing"
+repository = "https://github.com/tdergouzi/rs-order-utils"  # Update with your actual repo URL
+homepage = "https://github.com/tdergouzi/rs-order-utils"
+readme = "README.md"
+keywords = ["polymarket", "ethereum", "eip712", "clob", "orders"]
+categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
 # Alloy core types and primitives

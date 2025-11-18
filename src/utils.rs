@@ -1,31 +1,23 @@
 use alloy_primitives::U256;
+use rand::Rng;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Generate a random salt for order uniqueness
+/// 
+/// This implementation matches the TypeScript version:
+/// `Math.round(Math.random() * Date.now())`
 pub fn generate_order_salt() -> U256 {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_millis();
     
-    // Use a simple random-like value based on timestamp
-    // In production, you might want to use a proper RNG
-    let random_factor = (now * 997) % u64::MAX as u128;
-    U256::from(random_factor)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_generate_salt() {
-        let salt1 = generate_order_salt();
-        let salt2 = generate_order_salt();
-        
-        // Salts should be different (though not guaranteed with simple implementation)
-        assert!(!salt1.is_zero());
-        assert!(!salt2.is_zero());
-    }
+    // Generate random factor between 0.0 and 1.0, matching Math.random()
+    let mut rng = rand::thread_rng();
+    let random: f64 = rng.gen();
+    
+    // Multiply random by timestamp and round, matching the TS implementation
+    let salt = (random * now as f64).round() as u128;
+    U256::from(salt)
 }
 

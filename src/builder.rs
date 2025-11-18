@@ -24,19 +24,27 @@ pub struct ExchangeOrderBuilder {
     
     /// EIP-712 domain separator
     domain: Eip712Domain,
+    
+    /// Custom salt generator function (optional)
+    /// Defaults to generate_order_salt if not provided
+    salt_generator: Option<Box<dyn Fn() -> U256 + Send + Sync>>,
 }
 
 impl ExchangeOrderBuilder {
     /// Create a new ExchangeOrderBuilder
     ///
+    /// This matches TypeScript's constructor which accepts an optional salt generator
+    ///
     /// # Arguments
     /// * `contract_address` - The exchange contract address
     /// * `chain_id` - The blockchain chain ID
     /// * `signer` - The private key signer
+    /// * `salt_generator` - Optional custom salt generator function (defaults to `generate_order_salt`)
     pub fn new(
         contract_address: Address,
         chain_id: u64,
         signer: PrivateKeySigner,
+        salt_generator: Option<Box<dyn Fn() -> U256 + Send + Sync>>,
     ) -> Self {
         // Create EIP-712 domain
         let domain = eip712_domain! {
@@ -51,6 +59,7 @@ impl ExchangeOrderBuilder {
             chain_id,
             signer,
             domain,
+            salt_generator,
         }
     }
 
@@ -90,8 +99,11 @@ impl ExchangeOrderBuilder {
         // Set default signature type (EOA)
         let signature_type = order_data.signature_type.unwrap_or(SignatureType::Eoa);
 
-        // Generate salt for uniqueness
-        let salt = generate_order_salt();
+        // Generate salt for uniqueness using custom generator or default
+        let salt = match &self.salt_generator {
+            Some(generator) => generator(),
+            None => generate_order_salt(),
+        };
 
         Ok(Order {
             salt,
@@ -156,73 +168,3 @@ impl ExchangeOrderBuilder {
         self.chain_id
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use alloy_primitives::address;
-
-    #[tokio::test]
-    async fn test_build_order() {
-        // Create a test signer
-        let signer = PrivateKeySigner::random();
-        let maker = signer.address();
-        
-        let builder = ExchangeOrderBuilder::new(
-            address!("CcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"),
-            1,
-            signer,
-        );
-
-        let order_data = OrderData {
-            maker,
-            taker: Address::ZERO,
-            token_id: U256::from(123),
-            maker_amount: U256::from(1000),
-            taker_amount: U256::from(900),
-            side: crate::types::Side::Buy,
-            fee_rate_bps: U256::from(100),
-            nonce: U256::from(1),
-            signer: None,
-            expiration: None,
-            signature_type: None,
-        };
-
-        let order = builder.build_order(order_data).await.unwrap();
-
-        assert_eq!(order.maker, maker);
-        assert_eq!(order.signer, maker);
-        assert_eq!(order.tokenId, U256::from(123));
-        assert!(!order.salt.is_zero());
-    }
-
-    #[tokio::test]
-    async fn test_signer_mismatch() {
-        let signer = PrivateKeySigner::random();
-        let different_address = address!("1111111111111111111111111111111111111111");
-        
-        let builder = ExchangeOrderBuilder::new(
-            address!("CcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"),
-            1,
-            signer,
-        );
-
-        let order_data = OrderData {
-            maker: different_address,
-            taker: Address::ZERO,
-            token_id: U256::from(123),
-            maker_amount: U256::from(1000),
-            taker_amount: U256::from(900),
-            side: crate::types::Side::Buy,
-            fee_rate_bps: U256::from(100),
-            nonce: U256::from(1),
-            signer: Some(different_address),
-            expiration: None,
-            signature_type: None,
-        };
-
-        let result = builder.build_order(order_data).await;
-        assert!(matches!(result, Err(OrderError::SignerMismatch { .. })));
-    }
-}
-

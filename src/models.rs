@@ -65,6 +65,7 @@ sol! {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SignedOrder {
     /// The order details
+    #[serde(flatten)]
     pub order: Order,
     
     /// The order signature (hex string)

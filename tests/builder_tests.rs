@@ -4,8 +4,11 @@ use rs_order_utils::{ExchangeOrderBuilder, OrderData, Side};
 
 #[tokio::test]
 async fn test_build_order() {
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
+    
     // Create a test signer
-    let private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+    let private_key = std::env::var("PK").expect("PK must be set in .env file");
     let signer = private_key.parse::<PrivateKeySigner>().unwrap();
     let maker = signer.address();
     

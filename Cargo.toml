@@ -1,6 +1,6 @@
 [package]
 name = "rs_order_utils"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Ted"]
 license = "MIT"
@@ -37,6 +37,7 @@ tokio = { version = "1.0", features = ["full"], optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.0", features = ["full", "macros", "test-util"] }
+dotenv = "0.15"
 
 # [[example]]
 # name = "basic_order"

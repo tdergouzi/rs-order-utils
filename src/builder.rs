@@ -110,7 +110,7 @@ impl ExchangeOrderBuilder {
             maker: order_data.maker,
             signer: signer_address,
             taker: order_data.taker,
-            tokenId: order_data.token_id,
+            tokenId: order_data.token_id,  // Now U256 instead of String
             makerAmount: order_data.maker_amount,
             takerAmount: order_data.taker_amount,
             expiration,

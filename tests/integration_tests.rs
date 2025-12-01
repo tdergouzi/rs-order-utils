@@ -4,16 +4,19 @@ use rs_order_utils::{ExchangeOrderBuilder, OrderData, Side, SignatureType};
 
 #[tokio::test]
 async fn test_full_order_signing_flow() {
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
+    
     // Create a test signer
-    let private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+    let private_key = std::env::var("PK").expect("PK must be set in .env file");
     let signer = private_key.parse::<PrivateKeySigner>().unwrap();
     let maker = signer.address();
 
     // Create builder
-    let salt = U256::from(479249096354 as u64);
+    let salt = U256::from(1355686936322 as u64);
     let builder = ExchangeOrderBuilder::new(
-        address!("dFE02Eb6733538f8Ea35D585af8DE5958AD99E40"),
-        80002, // Polygon
+        address!("C5d563A36AE78145C45a50134d48A1215220f80a"),
+        137, // Polygon
         signer,
         Some(Box::new(move || salt)),
     );
@@ -21,23 +24,24 @@ async fn test_full_order_signing_flow() {
     // Create order data
     let order_data = OrderData {
         maker,
+        signer: Some(maker),
         taker: address!("0000000000000000000000000000000000000000"),
-        token_id: U256::from(1234),
-        maker_amount: U256::from(100000000),
-        taker_amount: U256::from(50000000),
-        side: Side::Buy,
-        fee_rate_bps: U256::from(100), // 1%
-        nonce: U256::from(0),
-        signer: None,
+        token_id: U256::from_str_radix("87769991026114894163580777793845523168226980076553814689875238288185044414090", 10).unwrap(),
+        maker_amount: U256::from(5000000),
+        taker_amount: U256::from(5617900),
         expiration: None,
-        signature_type: None,
+        nonce: U256::from(0),
+        fee_rate_bps: U256::from(0),
+        side: Side::Buy,
+        signature_type: Some(SignatureType::PolyGnosisSafe),
     };
 
     // Build and sign
     let signed_order = builder.build_signed_order(order_data).await.unwrap();
+    println!("Signed order: {:?}", signed_order);
 
     // Verify signature format
-    assert_eq!(signed_order.signature, "0x302cd9abd0b5fcaa202a344437ec0b6660da984e24ae9ad915a592a90facf5a51bb8a873cd8d270f070217fea1986531d5eec66f1162a81f66e026db653bf7ce1c"); // 0x + 130 hex chars (65 bytes)
+    assert_eq!(signed_order.signature, "0x47c2c5e8d17823b25af0e0a498863bfc5269825e88d523cd0c92959c6634e9bf04f282b99708cbd3baf035d30b962aac5469ec9a11fc398b5546f38fdcc0b8451b"); // 0x + 130 hex chars (65 bytes)
 }
 
 #[test]

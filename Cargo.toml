@@ -1,6 +1,6 @@
 [package]
 name = "rs_order_utils"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 authors = ["Ted"]
 license = "MIT"
@@ -15,8 +15,8 @@ categories = ["cryptography::cryptocurrencies"]
 # Alloy core types and primitives
 alloy-primitives = "0.8"
 alloy-sol-types = "0.8"
-alloy-signer = "0.5"
-alloy-signer-local = "0.5"
+alloy-signer = "0.8"
+alloy-signer-local = "0.8"
 
 # Crypto
 k256 = { version = "0.13", features = ["ecdsa", "std"] }

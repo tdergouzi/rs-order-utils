@@ -10,9 +10,9 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rs_order_utils = "0.1"
+rs_order_utils = "0.2"
 alloy-primitives = "0.8"
-alloy-signer-local = "0.5"
+alloy-signer-local = "0.8"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -34,6 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         address!("4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E"), // Contract address
         137, // Polygon chain ID
         signer,
+        None, // Use default salt generator
     );
 
     // Create order data

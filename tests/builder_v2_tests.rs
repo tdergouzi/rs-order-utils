@@ -168,6 +168,48 @@ async fn v2_metadata_and_builder_affect_hash() {
 }
 
 #[tokio::test]
+async fn v2_expiration_does_not_affect_hash() {
+    // V2 spec: `expiration` is carried in the API payload but NOT in the
+    // 11-field EIP-712 signed struct. Two orders identical except for
+    // `expiration` must produce the same struct hash (and signature).
+    let signer: PrivateKeySigner = ANVIL_TEST_PK.parse().unwrap();
+    let maker = signer.address();
+
+    let fixed_salt = U256::from(42u64);
+    let builder_inst = ExchangeOrderBuilder::new(
+        POLYGON_CTF_EXCHANGE,
+        137,
+        signer,
+        Some(Box::new(move || fixed_salt)),
+    );
+
+    let base = OrderData {
+        maker,
+        signer: None,
+        token_id: U256::from(1u64),
+        maker_amount: U256::from(1u64),
+        taker_amount: U256::from(1u64),
+        side: Side::Buy,
+        signature_type: None,
+        timestamp: Some(U256::from(1u64)),
+        metadata: None,
+        builder: None,
+        expiration: Some(U256::ZERO),
+    };
+    let mut with_long_expiration = base.clone();
+    with_long_expiration.expiration = Some(U256::from(9_999_999_999u64));
+
+    let o_base = builder_inst.build_order(&base).await.unwrap();
+    let o_exp = builder_inst.build_order(&with_long_expiration).await.unwrap();
+
+    assert_eq!(
+        builder_inst.build_order_hash(&o_base),
+        builder_inst.build_order_hash(&o_exp),
+        "expiration must not affect the EIP-712 signed hash"
+    );
+}
+
+#[tokio::test]
 async fn v2_side_serializes_as_uppercase_string() {
     let signer: PrivateKeySigner = ANVIL_TEST_PK.parse().unwrap();
     let maker = signer.address();

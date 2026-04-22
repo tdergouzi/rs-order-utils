@@ -108,6 +108,8 @@ Key V2 differences (vs V1):
 - `SignatureType::Poly1271` added for EIP-1271 smart-contract wallets
 - `side` serialized as `"BUY"`/`"SELL"` in API payload (V1 uses `"0"`/`"1"`)
 
+V2 signatures are **cross-validated byte-for-byte** against the official TypeScript `@polymarket/clob-client-v2` SDK for 7 canonical scenarios covering all four signature types. See `tests/v2_cross_language_vectors.rs`.
+
 ## Usage
 
 ```bash

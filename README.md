@@ -10,11 +10,13 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rs_order_utils = "0.2.1"
+rs_order_utils = "0.3.0-alpha.1"
 alloy-primitives = "0.8"
 alloy-signer-local = "0.8"
 tokio = { version = "1.0", features = ["full"] }
 ```
+
+> **V2 protocol support** — `0.3.0` adds a `v2` module (additive, non-breaking) that mirrors the 11-field V2 CTF Exchange order struct and the `Poly1271` smart-contract signature type. V1 consumers require no code changes. See the [V2 Quick Start](#v2-quick-start) below.
 
 ## Quick Start
 
@@ -59,6 +61,52 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+## V2 Quick Start
+
+```rust
+use alloy_primitives::{address, U256};
+use alloy_signer_local::PrivateKeySigner;
+use rs_order_utils::v2::{ExchangeOrderBuilder, OrderData};
+use rs_order_utils::Side;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let signer = PrivateKeySigner::random();
+    let maker = signer.address();
+
+    let builder = ExchangeOrderBuilder::new(
+        address!("4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E"),
+        137,
+        signer,
+        None,
+    );
+
+    let order_data = OrderData {
+        maker,
+        signer: None,           // defaults to maker
+        token_id: U256::from(123456u64),
+        maker_amount: U256::from(1_000_000u64),
+        taker_amount: U256::from(950_000u64),
+        side: Side::Buy,
+        signature_type: None,   // defaults to EOA
+        timestamp: None,        // defaults to Date.now() equivalent
+        metadata: None,         // defaults to bytes32(0)
+        builder: None,          // defaults to bytes32(0)
+        expiration: None,       // defaults to 0 (no expiration)
+    };
+
+    let signed_order = builder.build_signed_order(order_data).await?;
+    println!("V2 signature: {}", signed_order.signature);
+    Ok(())
+}
+```
+
+Key V2 differences (vs V1):
+- 11-field signed struct (dropped `taker`, `nonce`, `feeRateBps`; `expiration` moved to un-signed payload only)
+- Domain version bumped to `"2"`
+- `SignatureType::Poly1271` added for EIP-1271 smart-contract wallets
+- `side` serialized as `"BUY"`/`"SELL"` in API payload (V1 uses `"0"`/`"1"`)
 
 ## Usage
 

@@ -10,9 +10,9 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rs_order_utils = "0.3.0-alpha.1"
-alloy-primitives = "0.8"
-alloy-signer-local = "0.8"
+rs_order_utils = "0.4.0"
+alloy-primitives = "1"
+alloy-signer-local = "1"
 tokio = { version = "1.0", features = ["full"] }
 ```
 

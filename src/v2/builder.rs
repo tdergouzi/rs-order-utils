@@ -1,6 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use alloy_primitives::{keccak256, Address, PrimitiveSignature, U256};
+use alloy_primitives::{keccak256, Address, Signature, U256};
 use alloy_signer::Signer;
 use alloy_signer_local::PrivateKeySigner;
 use alloy_sol_types::{eip712_domain, Eip712Domain, SolStruct};
@@ -109,7 +109,7 @@ impl ExchangeOrderBuilder {
     }
 
     /// Sign an order via EIP-712.
-    pub async fn sign_order(&self, order: &Order) -> Result<PrimitiveSignature> {
+    pub async fn sign_order(&self, order: &Order) -> Result<Signature> {
         let hash = self.build_order_hash(order);
         self.signer
             .sign_hash(&hash.into())

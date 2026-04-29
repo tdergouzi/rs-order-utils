@@ -1,4 +1,4 @@
-use alloy_primitives::{Address, PrimitiveSignature, U256, keccak256};
+use alloy_primitives::{Address, Signature, U256, keccak256};
 use alloy_signer::Signer;
 use alloy_signer_local::PrivateKeySigner;
 use alloy_sol_types::{eip712_domain, Eip712Domain, SolStruct};
@@ -124,7 +124,7 @@ impl ExchangeOrderBuilder {
     /// Sign an order using EIP-712
     ///
     /// Equivalent to TypeScript's `buildOrderSignature` method
-    pub async fn sign_order(&self, order: &Order) -> Result<PrimitiveSignature> {
+    pub async fn sign_order(&self, order: &Order) -> Result<Signature> {
         // Calculate EIP-712 hash
         let hash = self.build_order_hash(order);
         

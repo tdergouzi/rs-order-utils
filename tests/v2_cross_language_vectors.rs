@@ -71,6 +71,14 @@ async fn v2_signatures_match_ts_sdk_byte_for_byte() {
     let signer: PrivateKeySigner = TEST_PK.parse().expect("parse pk");
 
     for v in &vectors {
+        // Poly1271 vectors skipped: Rust now emits an ERC-7739-wrapped blob
+        // (required for on-chain `isValidSignature`), while the TS reference
+        // vectors are still raw 65-byte ECDSA. Re-enable once the TS SDK
+        // emits the same ERC-7739 wrapping.
+        if v.input.signature_type == SignatureType::Poly1271 as u8 {
+            continue;
+        }
+
         let contract = Address::from_str(&v.contract).expect("parse contract");
         let salt_u256 = U256::from_str_radix(&v.salt, 10).expect("parse salt");
         let salt_clone = salt_u256;

@@ -18,6 +18,8 @@ tokio = { version = "1.0", features = ["full"] }
 
 > **V2 protocol support** — `0.3.0` adds a `v2` module (additive, non-breaking) that mirrors the 11-field V2 CTF Exchange order struct and the `Poly1271` smart-contract signature type. V1 consumers require no code changes. See the [V2 Quick Start](#v2-quick-start) below.
 
+> Release history lives in [CHANGELOG.md](./CHANGELOG.md).
+
 ## Quick Start
 
 ```rust
@@ -108,7 +110,7 @@ Key V2 differences (vs V1):
 - `SignatureType::Poly1271` added for EIP-1271 smart-contract wallets
 - `side` serialized as `"BUY"`/`"SELL"` in API payload (V1 uses `"0"`/`"1"`)
 
-V2 signatures are **cross-validated byte-for-byte** against the official TypeScript `@polymarket/clob-client-v2` SDK for the EOA, PolyProxy, and PolyGnosisSafe signature types. `Poly1271` is excluded from cross-language parity until the TS SDK adopts the ERC-7739 nested `TypedDataSign` wrapping that the deposit wallet's on-chain `isValidSignature` requires (see [Changelog 0.4.2](#042--v2-poly1271-signing)). See `tests/v2_cross_language_vectors.rs`.
+V2 signatures are **cross-validated byte-for-byte** against the official TypeScript `@polymarket/clob-client-v2` SDK for the EOA, PolyProxy, and PolyGnosisSafe signature types. `Poly1271` is excluded from cross-language parity until the TS SDK adopts the ERC-7739 nested `TypedDataSign` wrapping that the deposit wallet's on-chain `isValidSignature` requires (see [CHANGELOG.md](./CHANGELOG.md)). See `tests/v2_cross_language_vectors.rs`.
 
 ## Usage
 
@@ -146,14 +148,6 @@ MIT
 
 - Original TypeScript implementation: [Polymarket clob-order-utils](https://github.com/Polymarket/clob-order-utils)
 - Built with [Alloy](https://github.com/alloy-rs/alloy) - the modern Ethereum Rust library
-
-## Changelog
-
-### 0.4.2 — V2 Poly1271 signing
-
-Implements the ERC-7739 nested `TypedDataSign` scheme for `Poly1271` (smart-contract wallet) orders. `v2::ExchangeOrderBuilder::build_signed_order` now produces a deposit-wallet-compatible blob verified via `isValidSignature` (ERC-1271); previously emitted a raw 65-byte ECDSA that on-chain validation would reject. New public method `sign_order_poly1271` exposes the same path directly. The EOA-vs-`signer` mismatch check is skipped for `Poly1271` since the order's `signer` is the deposit-wallet contract, not the EOA.
-
-> **Cross-language parity note**: `tests/v2_cross_language_vectors.rs` skips `Poly1271` vectors because the upstream TS `@polymarket/clob-client-v2` SDK still emits raw 65-byte ECDSA. Re-enable once the TS SDK adopts the same ERC-7739 wrapping. EOA / PolyProxy / PolyGnosisSafe coverage is unchanged.
 
 ---
 
